@@ -70,7 +70,7 @@ echo "<br>"; // 2012-02-01
 echo $next_month_start->format('Y-m-d'); // 2012-02-01
 echo "<br>"; // 2012-02-01
 echo $next_month_end->format('Y-m-d'); // 2012-02-29
-echo "<br>11111"; // 2012-02-01
+echo "<br>2222"; // 2012-02-01
 
 
 

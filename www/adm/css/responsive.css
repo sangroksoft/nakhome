@@ -1,0 +1,49 @@
+@media screen and (max-width: 576px) {
+	html,body{width:100%;height:100%;overflow-x: hidden;}
+   #hd{min-width:310px;width:100%;}
+   #gnb{min-width:310px;width:100%;}
+   .gnb_1dli{width:32%;padding:0;}
+   #wrapper{min-width:310px;width:100%;padding:10px;box-sizing:border-box;}
+   #ft{min-width:310px;width:100%;box-sizing:border-box;margin:0;padding:0;text-align: center;}
+   h1{min-width:310px;width:100%;box-sizing:border-box;}
+   .xs-hidden{display:none;}
+   .mobile_table th,.mobile_table tr,.mobile_table td{display:block;clear:both;box-sizing:border-box;}
+   .mobile_table th{margin-top:25px;padding: 10px;background-color:#d5dbe4;}
+   .mobile_table tr td{border:0;padding: 15px;}
+   .tbl_wrap{padding:0;}
+   .tbl_frm01 td{width:100% !important;}
+   .clear{clear:both; display:block !important;}
+   .mobile_table td input[type="text"]{margin-bottom:15px;width:80%;}
+   tbody tr:first-child th{margin-top:0;}
+   .xs-width30{width:30%;}
+   .search-input{position:relative;right:42px;}
+   td{width:auto !important;min-width:auto !important;}
+   .tb-margin{margin:15px 0;}
+   .m_td_title{background-color:#f3f3f3;width:15px;}
+   .m_width30{width:30%;}
+   #layerpopup2, #topdiv_wrap2{width:100% !important;}
+   #layerpopup2{position:fixed !important;top:0 !important;}
+   .w97{width:69%;}
+   .tbl_head01 textarea{width:70%;}
+   .c_book_detail, .close_detail{display:none;}
+   .m_nomargin{margin:0 !important;}
+   .lg-hidden{display:block !important;}
+   .border-top{border-top:2px solid black;}
+   .m-float{float:left;display:block !important;}
+   .m_book_date{text-align:center;font-weight:bold; border-bottom:1px solid #c8c8c8;font-size:16px;padding-bottom: 10px;}
+   .padding-bottom{padding-bottom:25px;}
+   .m_book_detailtd{padding:10px !important; text-align:left !important;padding-bottom:55px !important;}
+   .hideAndShowBtn{background-color:#e6e6e6;}
+   .m_detail_table{margin-top:25px; border-top:2px solid #a9a9a9; border-bottom:2px solid #a9a9a9;}
+   .m-width-75{width:75px !important;}
+   .m-width-70{width:55px !important;}
+   #book_modal{top:22px !important;}
+   #book_tbl_wrap{padding:0 !important;}
+   #iframe_wrap2 iframe{width:100% !important;}
+   #company_table th, #width100 th{width:100% !important;}
+   .svcdiv{width:120px !important;}
+}
+
+.lg-hidden,.m-float{display:none;}
+#book_modal{position: absolute;top: 70px;right: 20px;}
+#book_tbl_wrap{padding: 18px 20px;}

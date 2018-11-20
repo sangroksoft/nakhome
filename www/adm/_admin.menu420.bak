@@ -1,0 +1,5 @@
+<?php
+$menu['menu420'] = array (
+    array('420000', '통계관리', ''.G5_ADMINSHIP_URL.'/book_stat.php', '')
+);
+?>

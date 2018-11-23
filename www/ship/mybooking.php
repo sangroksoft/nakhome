@@ -213,7 +213,7 @@ h3.item-title{display:inline-block;padding-left:20px;}
 							<td colspan="10">
 
 								<?php if($row[bk_status] >= "0") { ?>
-								<form id="fbookmodify_<?php echo $row[bk_ymd];?>" onsubmit="return fbookmodify_submit(this,'<?php echo $row[bk_ymd];?>');" method="post">
+								<form id="fbookmodify_<?php echo $row[bk_idx];?>" onsubmit="return fbookmodify_submit(this,'<?php echo $row[bk_idx];?>');" method="post">
 								<input type="hidden" name="token" value="">
 								<input type="hidden" name="bk_idx" value="<?php echo $row[bk_idx] ?>">
 								<input type="hidden" name="bk_status" value="<?php echo $row[bk_status] ?>">
@@ -302,16 +302,27 @@ h3.item-title{display:inline-block;padding-left:20px;}
 														$_ship_scsql = sql_fetch(" select * from m_schedule where s_idx = '{$s_idx}' and sc_ymd = '{$row[bk_ymd]}' ");
 														$_available = $_ship_scsql[sc_max] - $_ship_scsql[sc_booked];
 													?>
+
 													<select id="rtn_selbox" name="bk_member_cnt" class="required" style="height:28px;" required="required">
 													<?php for ($i=0; $i<$_ship_scsql[sc_max]; $i++) { ?>	
 													<?php 
 														$selected = "";
 														$disabled = "";
-														$j=$i+1;
-														if($j > $_available) $disabled = "disabled='disabled' ";
-														if($j == $row[bk_member_cnt]) $selected = " selected='selected' ";
+                                                        $addOptStr = "";
+
+                                                        $j=$i+1;
+
+                                                        if($comfig['overbooking'] == "1") {
+                                                            if($i>=$_available) {
+                                                                $addOptStr = "(대기접수)";
+                                                            }
+                                                        } else {
+                                                            if($j > $_available) $disabled = "disabled='disabled' ";
+                                                        }    
+
+                                                        if($j == $row[bk_member_cnt]) $selected = " selected='selected' ";
 													?>
-													<option value="<?php echo $j?>" <?php echo $disabled?>  <?php echo $selected?>><?php echo $j?> 명</option>
+													<option value="<?php echo $j?>" <?php echo $disabled?>  <?php echo $selected?>><?php echo $j?> 명<?php echo $addOptStr?></option>
 													<?php } ?>
 													</select>
 													<?php } else if($row[bk_status] == "1") {?>
@@ -399,8 +410,8 @@ h3.item-title{display:inline-block;padding-left:20px;}
 								<?php if((!($row[bk_status] == "-1" || $row[bk_status] == "-2")) && ($bk_ymd >= $todaytime)) { ?>
 								<div style="padding:10px 0 40px 0;">
 									<div class="lsh-write-btn-right">
-										<input type="submit" class="btn-book-modi"  id="btn-book-modi" value="예약수정">
 										<?php if($row[bk_status] == "0") { ?>
+										<input type="submit" class="btn-book-modi"  id="btn-book-modi" value="예약수정">
 										<button type="button" class="btn-book-cancel" data-bkidx="<?php echo $row[bk_idx];?>">예약취소</button>
 										<?php } else if($row[bk_status] == "1") { ?>
 										<button type="button" class="btn-book-cancel" data-bkidx="<?php echo $row[bk_idx];?>">예약취소신청</button>
@@ -485,16 +496,20 @@ $(document).off("click",".btn-book-cancel").on("click",".btn-book-cancel",functi
 </script>
 <script>
 // 리스트 적용
-function fbookmodify_submit(f,bkymd)
+function fbookmodify_submit(f,bkidx)
 {
-	ajax_fbookmodify_submit(bkymd);
-	return false;
+    if(!(confirm("예약내용을 수정하시겠습니까?"))) {
+        return false;
+    } else {
+	    ajax_fbookmodify_submit(bkidx);
+        return false;
+    }
 }
 
 // 리스트 적용 AJAX 처리
-function ajax_fbookmodify_submit(bkymd)
+function ajax_fbookmodify_submit(bkidx)
 {
-	var formData = $("#fbookmodify_"+bkymd).serialize();
+	var formData = $("#fbookmodify_"+bkidx).serialize();
 
 	$.ajax({ 
 		type: "POST",

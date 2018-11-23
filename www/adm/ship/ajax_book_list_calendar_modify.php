@@ -62,13 +62,18 @@ for ($i=0; $i<count($_POST['chk']); $i++)
     // 기존 예약상태가 예약완료,예약취소요청인 경우에는 이미 예약확정인원으로 잡혀있기 때문에 굳이 체크필요없음.
     // 리스트 수정항목에 인원수정항목이 없으므로 상태변화에 따른 인원변화가 있는 예약접수->예약완료만 체크하면 됨.
     // 따라서 예약접수상태에서 예약완료로 변경하는 경우에만 체크함.
-	if($new_bk_status != $ori_bk_status)
-	{
-		if($ori_bk_status == "0")
-		{
-			if($new_bk_status == "1")
-			{
-				if($bkmemcnt_tot > $sc[sc_max]) {$errorstr = " 예약인원초과 항목이 있습니다."; $errcnt++; break;}
+	if($new_bk_status != $ori_bk_status) {
+		if($ori_bk_status == "0") {
+			if($new_bk_status == "1") {
+                // 관리자에서는 오버부킹 허용안함.
+                // 오버부킹을 쓰고싶으면 애초에 출조인원 설정을 조금 넉넉히 설정하면 됨.
+                // 그게 아니면 기존 예약확정된 인원을 조정(수정)하거나 취소시키거나 해서 최종인원은 출조인원이내이어야 함.
+                // 예약확정된 출조인원을 오버하면 에러뱉는게 맞음.
+                if($comfig['overbooking'] == "1") {
+				    if($bkmemcnt_tot > $sc[sc_max]) {$errorstr = " 예약인원초과 항목이 있습니다."; $errcnt++; break;}
+                } else {
+				    if($bkmemcnt_tot > $sc[sc_max]) {$errorstr = " 예약인원초과 항목이 있습니다."; $errcnt++; break;}
+                }
 			}
 		}
 	}

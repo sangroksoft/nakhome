@@ -138,6 +138,9 @@ h3.item-title{display:inline-block;padding-left:20px;}
 .scend {color:red;}
 .guide-wrap{height: 550px;border: 1px solid #d9d9d9;text-align: center;padding: 30% 0;}
 
+#overbookinNoti{display:none;color:red;}
+#overbookinNoti.show{display:inline-block;}
+
 @media (max-width: 991px) {
 	.swiper-container {height: 320px;}
 	.book-title{display:none;}
@@ -344,6 +347,9 @@ h3.item-title{display:inline-block;padding-left:20px;}
 					<span id="book_theme">
 						<span style="color:blue;">
 							※ 입금계좌 : <?php echo $comfig['com_bank'];?> <?php echo $comfig['com_account'];?> <?php echo $comfig['com_account_owner'];?>
+						</span>
+						<span id="overbookinNoti">
+							※ 대기접수 시에는 승선예약이 확정된 후에 입금해 주세요.
 						</span>
 					</span>
 				</div>
@@ -581,6 +587,7 @@ function ajax_get_schedule(sidx, dateval) {
 					$("#s_idx").val(rtn_s_idx);
 					var bookResultReady = "<li class='ready'>※ 출조인원을 선택하십시오.</li>";
 					$("#book_result").html(bookResultReady);
+                    $("#overbookinNoti").removeClass("show");
 				}
 			}
 		},
@@ -592,23 +599,43 @@ function ajax_get_schedule(sidx, dateval) {
 
 // 인원선택시 요금계산후 하단에 표시
 function showResult(bookcnt) {
-	var sidx = $.trim($("#s_idx").val());
-	var scymd = $.trim($("#sc_ymd").val());
-	$.ajax({ 
-		type: "GET",
-		url: g5_url+"/ship/ajax_booking_preview.php",
-		data: "s_idx="+sidx+"&sc_ymd="+scymd+"&bk_member_cnt="+bookcnt, 
-		beforeSend: function(){
-			loadstart();
-		},
-		success: function(msg){ 
-			var msgarray = $.parseJSON(msg);
-			$("#book_result").html(msgarray.cont);
-		},
-		complete: function(){
-			loadend();
-		}
-	});
+    if(!bookcnt || bookcnt < 1) {
+        var bookResultReady = "<li class='ready'>※ 출조인원을 선택하십시오.</li>";
+		$("#book_result").html(bookResultReady);
+        $("#overbookinNoti").removeClass("show");
+    } else {
+        var sidx = $.trim($("#s_idx").val());
+        var scymd = $.trim($("#sc_ymd").val());
+        $.ajax({ 
+            type: "GET",
+            url: g5_url+"/ship/ajax_booking_preview.php",
+            data: "s_idx="+sidx+"&sc_ymd="+scymd+"&bk_member_cnt="+bookcnt, 
+            beforeSend: function(){
+                loadstart();
+            },
+            success: function(msg){ 
+                var msgarray = $.parseJSON(msg);
+                if(msgarray.rslt == "error")
+                {
+                    alert(msgarray.errcode); 
+                    if(msgarray.errurl) {document.location.replace(msgarray.errurl);}
+                    else {	loadend(); return false;}
+                }
+                else
+                {
+                    $("#book_result").html(msgarray.cont);
+                    if(msgarray.overbooking == 1) {
+                        $("#overbookinNoti").addClass("show");
+                    } else {
+                        $("#overbookinNoti").removeClass("show");
+                    }
+                }
+            },
+            complete: function(){
+                loadend();
+            }
+        });
+    }
 }
 
 $(document).ready(function(){
@@ -667,8 +694,12 @@ function fbook_submit(f)
 		alert("약관 동의후 이용하실 수 있습니다."); return false;
 	}
 	else {
-		ajax_fbook_submit();
-		return false;
+        if(!(confirm("예약을 진행하시겠습니까?"))) {
+            return false;
+        } else {
+            ajax_fbook_submit();
+            return false;
+        }
 	}
 }
 

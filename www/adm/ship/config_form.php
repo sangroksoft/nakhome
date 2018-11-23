@@ -172,9 +172,14 @@ $frm_submit = '<div class="btn_confirm01 btn_confirm">
 
         <tr>
             <th scope="row"><label for="">예약기능사용</label></th>
-            <td colspan="3">
+            <td>
 				<input type="radio" name="usebooking" value="0" id="usebooking_0" <?php if($comfig['usebooking'] == "0") echo " checked='checked' "; ?> class=" frm_input"> 사용함
 				<input type="radio" name="usebooking" value="1" id="usebooking_1" <?php if($comfig['usebooking'] == "1") echo " checked='checked' "; ?> class=" frm_input"> 사용안함
+            </td>
+            <th scope="row"><label for="">예약접수설정</label></th>
+            <td>
+				<input type="radio" name="overbooking" value="0" id="overbooking_0" <?php if($comfig['overbooking'] == "0") echo " checked='checked' "; ?> class=" frm_input"> 출조인원초과 예약불가
+				<input type="radio" name="overbooking" value="1" id="overbooking_1" <?php if($comfig['overbooking'] == "1") echo " checked='checked' "; ?> class=" frm_input"> 출조인원초과 예약허용
             </td>
         </tr>
         <tr>

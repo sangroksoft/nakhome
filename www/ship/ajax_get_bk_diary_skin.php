@@ -177,36 +177,37 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 				$bkMebers = get_bk_members($sc[s_idx], $sc[sc_ymd]);
 				$has_schedule = false;
 
-				if($is_past == false) {
-					if($sc[sc_idx]) {
-						// 출조공지
-						$sc_desc = get_text($sc[sc_desc],1);
+				if($is_past == false) { // 과거일자가 아니라면
+					if($sc[sc_idx]) { // 스케쥴설정이 되어 있다면
 						$has_schedule = true;
 
+						// 출조공지
+						$sc_desc = get_text($sc[sc_desc],1);
 						// 예약가능인원
 						$available = $sc[sc_max] - $sc[sc_booked];
 						$available_str = '<span style="color:blue;">'.$available.'명</span>';
 						$availcnt_css = "availcnt";
 						$tdoffcss2 = "";
 
-						if(!$sc[sc_idx]) {
-							$available = 0;
-							$available_str = '<span style="color:red;">예약불가</span>';
-							$availcnt_css = "";
-						} else {
-							if($sc[sc_status] != "0") {
-								$available = 0;
-								$available_str = '<span style="color:red;">예약마감</span>';
-								$availcnt_css = "";
-							}
-							if($available == "0") 
-							{
-								$available = 0;
-								$available_str = '<span style="color:red;">예약마감</span>';
-								$availcnt_css = "";
-							}
-						}
-					} else {
+                        if($sc[sc_status] != "0") { //예약마감됨(관리자처리)
+                            $available = 0;
+                            $available_str = '<span style="color:red;">예약마감</span>';
+                            $availcnt_css = "";
+						    //$tdoffcss2 = "td-off";
+                        } else { //예약접수중
+                            if($available == "0") {
+                                if($comfig['overbooking'] == "1") {
+                                    $available_str = '<span style="color:blue;">대기접수가능</span>';
+                                } else {
+                                    $available = 0;
+                                    $available_str = '<span style="color:red;">예약마감</span>';
+                                    $availcnt_css = "";
+						            //$tdoffcss2 = "td-off";
+                                }
+                            }
+                        }
+
+					} else { // 스케쥴설정이 없다면
 						$has_schedule = false;
 
 						$available = 0;
@@ -214,13 +215,13 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 						$availcnt_css = "";
 						$tdoffcss2 = "td-off";
 					}
-				} else {
+				} else { // 과거일자라면 
 					if($sc[sc_idx]) {
 						$has_schedule = true;
 						// 출조공지
 						$sc_desc = get_text($sc[sc_desc],1);
 					} else {
-						$has_schedule = true;
+						$has_schedule = false;
 						$sc_desc = "출조일정이 없습니다.";
 					}
 
@@ -248,7 +249,11 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 						<div class="bk_btn">
 							<?php if($available > 0) {?>
 							<button type="button" data-sidx="<?php echo $sc[s_idx];?>" data-ymd="<?php echo $_sc_ymd;?>" data-fymd="<?php echo $_sc_ymd;?>" class="btn-bk-link">예약하기</a>
-							<?php } ?>
+							<?php } else { ?>
+                            <?php if($comfig['overbooking'] == "1" && $has_schedule == true && $sc[sc_status] == "0") { ?>
+							<button type="button" data-sidx="<?php echo $sc[s_idx];?>" data-ymd="<?php echo $_sc_ymd;?>" data-fymd="<?php echo $_sc_ymd;?>" class="btn-bk-link btn-wait">대기하기</a>
+                            <?php }?>
+                            <?php }?>
 						</div>
 					</div>
 				</td>

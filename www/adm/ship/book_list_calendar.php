@@ -193,7 +193,7 @@ include_once(G5_ADMINSHIP_PATH.'/ml_layer.php');
 						<div style="padding-bottom:10px; float:left;">
 							<span style="color:#111;font-weight:bolder;">※ <?php echo $s_name; ?> (정원 <?php echo $sc_max; ?>명)  - <?php echo $sc_theme; ?></span>
 							(
-							<span class="bookMem" style="color:#333;">예약접수 <?php echo $sc_wait; ?>명,</span>
+							<span class="bookMem" style="color:#333;">예약대기 <?php echo $sc_wait; ?>명,</span>
 							<span class="bookMem" style="color:red;">예약취소 <?php echo $sc_cancel; ?>명,</span>
 							<span class="bookMem" style="color:blue;">예약확정 <?php echo $sc_booked; ?>명,</span>
 							<span class="bookMem" style="color:green;">예약가능 <?php echo $sc_available; ?>명</span>
@@ -245,7 +245,7 @@ include_once(G5_ADMINSHIP_PATH.'/ml_layer.php');
 									{
 										case("-2") : $bk_status = "<span style='color:red;'>예약취소요청</span>"; break;
 										case("-1") : $bk_status = "<span style='color:red;'>예약취소</span>";$addHideClass="canceled"; break;
-										case("0") : $bk_status = "<span style='color:#333;'>예약접수</span>"; break;
+										case("0") : $bk_status = "<span style='color:#333;'>예약대기</span>"; break;
 										case("1") : $bk_status = "<span style='color:blue;'>예약완료</span>"; break;
 									}	
 								?>
@@ -346,7 +346,7 @@ include_once(G5_ADMINSHIP_PATH.'/ml_layer.php');
 										<?php } else { ?>
 										<select name="bk_status[<?php echo $z ?>]" class="selectbox100">
 											<option value="-1">예약취소</option>
-											<option value="0" selected='selected'>예약접수</option>
+											<option value="0" selected='selected'>예약대기</option>
 											<option value="1">예약완료</option>
 										</select>
 										<?php } ?>
@@ -362,10 +362,10 @@ include_once(G5_ADMINSHIP_PATH.'/ml_layer.php');
 					<input type="hidden" name="sc_idx" value="<?php echo $row[sc_idx] ?>">
 					<input type="hidden" name="sc_ymd" value="<?php echo $row[sc_ymd] ?>">
 
-					<div style="padding-bottom:10px; float:left;">		
+					<div style="padding-top:10px; float:left;">		
 						<span style="color:#111;font-weight:bolder;">※ <?php echo $s_name; ?> (정원 <?php echo $sc_max; ?>명)  - <?php echo $sc_theme; ?></span>
 						(
-						<span class="bookMem" style="color:#333;">예약접수 <?php echo $sc_wait; ?>명,</span>
+						<span class="bookMem" style="color:#333;">예약대기 <?php echo $sc_wait; ?>명,</span>
 						<span class="bookMem" style="color:red;">예약취소 <?php echo $sc_cancel; ?>명,</span>
 						<span class="bookMem" style="color:blue;">예약확정 <?php echo $sc_booked; ?>명,</span>
 						<span class="bookMem" style="color:green;">예약가능 <?php echo $sc_available; ?>명</span>
@@ -374,49 +374,6 @@ include_once(G5_ADMINSHIP_PATH.'/ml_layer.php');
 					<div style="padding-bottom:10px; float:right;">		
 						<button type="submit" id="btn_<?php echo $row[sc_ymd];?>" data-ymd="<?php echo $row[sc_ymd];?>" class="btn-list-modi">설정적용</button>
 					</div>
-					<?php for($k=0;$bkrow=sql_fetch_array($bkresult);$k++) { ?>
-						<?php
-							$z = $row[sc_ymd]."_".$k;
-							// 회원ID
-							$bk_mb_id = $bkrow[bk_mb_id];
-							// 회원명
-							$bk_mb_name = get_text($bkrow[bk_mb_name]);
-							// 예약자(입금자)명
-							$bk_banker = get_text($bkrow[bk_banker]);
-							// 예약자연락처
-							$bk_tel = get_text($bkrow[bk_tel]);
-							// 어선명
-							$s_name = $s_name;
-							// 출조테마
-							$bk_theme = get_text($bkrow[bk_theme]);
-							// 출조일
-							$bk_ymd = $bkrow[bk_y]."-".$bkrow[bk_m]."-".$bkrow[bk_d];
-							// 출조인원
-							$bk_member_cnt = number_format($bkrow[bk_member_cnt]);
-							// 예약메모
-							$bk_memo = get_text($bkrow[bk_memo]);
-							// 예약접수일
-							$bk_datetime = $bkrow[bk_datetime];
-							// 총출조비용
-							$bk_price_total = number_format($bkrow[bk_price_total]);
-							// 수금액
-							$pay_amount = number_format($bkrow[pay_amount]);
-							if($bkrow[pay_amount] >= 0) $misu_total = $bkrow[pay_amount] - $bkrow[bk_price_total];
-							else if($bkrow[pay_amount] < 0) $misu_total = $bkrow[pay_amount] + $bkrow[bk_price_total];
-	
-							// 미수잔액
-							//$misu_total = $bkrow[bk_price_total] - $bkrow[pay_amount];
-							$misu_total = number_format($misu_total);
-							// 예약상태
-							switch($bkrow[bk_status])
-							{
-								case("-2") : $bk_status = "<span style='color:red;'>예약취소요청</span>"; break;
-								case("-1") : $bk_status = "<span style='color:red;'>예약취소</span>"; break;
-								case("0") : $bk_status = "<span style='color:#333;'>예약접수</span>"; break;
-								case("1") : $bk_status = "<span style='color:blue;'>예약완료</span>"; break;
-							}	
-						?>
-					
 					<table>
 						<caption><?php echo $g5['title']; ?> 목록</caption>
 						<thead>
@@ -435,54 +392,95 @@ include_once(G5_ADMINSHIP_PATH.'/ml_layer.php');
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td class="inner-td td80">
-									<?php echo $bk_status;?>
-									<input type="hidden" name="chk[]" value="<?php echo $z ?>" id="chk_<?php echo $z ?>">
-									<input type="hidden" name="bk_idx[<?php echo $z ?>]" value="<?php echo $bkrow['bk_idx'] ?>" id="bk_idx_<?php echo $z ?>">
-								</td>
-								<td class="inner-td td60">
-									<?php echo $bk_mb_name;?>
-								</td>
-								<td class="inner-td td60"><span style="color:#999;"><?php echo $bk_banker; ?></span></td>
-								<td class="inner-td td80"><?php echo $bk_tel; ?></td>
-								<td class="inner-td td50">
-									<?php echo $bk_member_cnt; ?>
-									<input type="hidden" name="bk_member_cnt[<?php echo $z ?>]" class="td60 ta-right" maxlength="7" value="<?php echo $bkrow['bk_member_cnt'] ?>">
-								</td>
-								<td class="inner-td td130"><?php echo $bk_datetime; ?></td>
-								<td class="inner-td ta-left"><?php echo $bk_memo; ?></td>
-								<td class="inner-td td70"><?php echo $bk_price_total; ?></td>
-								<td class="inner-td td70">
-									<input type="text" name="pay_amount[<?php echo $z ?>]" class="td60 ta-right" maxlength="7" value="<?php echo $pay_amount; ?>">
-								</td>
-								<td class="inner-td td70"><span style="color:red;"><?php echo $misu_total; ?></span></td>
-								<td class="inner-td td100">
-									<?php if($bkrow[bk_status] == "-2") {?>
-									<select name="bk_status[<?php echo $z ?>]" class="selectbox100">
-										<option value="-2" selected='selected' >예약취소요청</option>
-										<option value="-1">예약취소</option>
-										<option value="1">예약완료</option>
-									</select>
-									<?php } else if($bkrow[bk_status] == "-1") { ?>
-									<span style="color:red;">예약취소</span>
-									<input type="hidden" name="bk_status[<?php echo $z ?>]" value="-1">
-									<?php } else if($bkrow[bk_status] == "1") { ?>
-									<select name="bk_status[<?php echo $z ?>]" class="selectbox100">
-										<option value="-1">예약취소</option>
-										<option value="1" selected='selected'>예약완료</option>
-									</select>
-									<?php } else { ?>
-									<select name="bk_status[<?php echo $z ?>]" class="selectbox100">
-										<option value="-1">예약취소</option>
-										<option value="0" selected='selected'>예약접수</option>
-										<option value="1">예약완료</option>
-									</select>
-									<?php } ?>
-								</td>
-							</tr>
-							<?php } ?>
-							
+                        <?php for($k=0;$bkrow=sql_fetch_array($bkresult);$k++) { ?>
+                        <?php
+                            $z = $row[sc_ymd]."_".$k;
+                            // 회원ID
+                            $bk_mb_id = $bkrow[bk_mb_id];
+                            // 회원명
+                            $bk_mb_name = get_text($bkrow[bk_mb_name]);
+                            // 예약자(입금자)명
+                            $bk_banker = get_text($bkrow[bk_banker]);
+                            // 예약자연락처
+                            $bk_tel = get_text($bkrow[bk_tel]);
+                            // 어선명
+                            $s_name = $s_name;
+                            // 출조테마
+                            $bk_theme = get_text($bkrow[bk_theme]);
+                            // 출조일
+                            $bk_ymd = $bkrow[bk_y]."-".$bkrow[bk_m]."-".$bkrow[bk_d];
+                            // 출조인원
+                            $bk_member_cnt = number_format($bkrow[bk_member_cnt]);
+                            // 예약메모
+                            $bk_memo = get_text($bkrow[bk_memo]);
+                            // 예약접수일
+                            $bk_datetime = $bkrow[bk_datetime];
+                            // 총출조비용
+                            $bk_price_total = number_format($bkrow[bk_price_total]);
+                            // 수금액
+                            $pay_amount = number_format($bkrow[pay_amount]);
+                            if($bkrow[pay_amount] >= 0) $misu_total = $bkrow[pay_amount] - $bkrow[bk_price_total];
+                            else if($bkrow[pay_amount] < 0) $misu_total = $bkrow[pay_amount] + $bkrow[bk_price_total];
+    
+                            // 미수잔액
+                            //$misu_total = $bkrow[bk_price_total] - $bkrow[pay_amount];
+                            $misu_total = number_format($misu_total);
+                            // 예약상태
+                            switch($bkrow[bk_status])
+                            {
+                                case("-2") : $bk_status = "<span style='color:red;'>예약취소요청</span>"; break;
+                                case("-1") : $bk_status = "<span style='color:red;'>예약취소</span>"; break;
+                                case("0") : $bk_status = "<span style='color:#333;'>예약대기</span>"; break;
+                                case("1") : $bk_status = "<span style='color:blue;'>예약완료</span>"; break;
+                            }	
+                        ?>
+                        <tr class="showmodal" data-tgt="booking" data-valarr="<?php echo $bkrow['bk_idx'] ?>|u">
+                            <td class="inner-td td80">
+                                <?php echo $bk_status;?>
+                                <input type="hidden" name="chk[]" value="<?php echo $z ?>" id="chk_<?php echo $z ?>">
+                                <input type="hidden" name="bk_idx[<?php echo $z ?>]" value="<?php echo $bkrow['bk_idx'] ?>" id="bk_idx_<?php echo $z ?>">
+                            </td>
+                            <td class="inner-td td60">
+                                <?php echo $bk_mb_name;?>
+                            </td>
+                            <td class="inner-td td60"><span style="color:#999;"><?php echo $bk_banker; ?></span></td>
+                            <td class="inner-td td80"><?php echo $bk_tel; ?></td>
+                            <td class="inner-td td50">
+                                <?php echo $bk_member_cnt; ?>
+                                <input type="hidden" name="bk_member_cnt[<?php echo $z ?>]" class="td60 ta-right" maxlength="7" value="<?php echo $bkrow['bk_member_cnt'] ?>">
+                            </td>
+                            <td class="inner-td td130"><?php echo $bk_datetime; ?></td>
+                            <td class="inner-td ta-left"><?php echo $bk_memo; ?></td>
+                            <td class="inner-td td70"><?php echo $bk_price_total; ?></td>
+                            <td class="inner-td td70" onclick="event.cancelBubble = true;">
+                                <input type="text" name="pay_amount[<?php echo $z ?>]" class="td60 ta-right" maxlength="7" value="<?php echo $pay_amount; ?>">
+                            </td>
+                            <td class="inner-td td70"><span style="color:red;"><?php echo $misu_total; ?></span></td>
+                            <td class="inner-td td100" onclick="event.cancelBubble = true;">
+                                <?php if($bkrow[bk_status] == "-2") {?>
+                                <select name="bk_status[<?php echo $z ?>]" class="selectbox100">
+                                    <option value="-2" selected='selected' >예약취소요청</option>
+                                    <option value="-1">예약취소</option>
+                                    <option value="1">예약완료</option>
+                                </select>
+                                <?php } else if($bkrow[bk_status] == "-1") { ?>
+                                <span style="color:red;">예약취소</span>
+                                <input type="hidden" name="bk_status[<?php echo $z ?>]" value="-1">
+                                <?php } else if($bkrow[bk_status] == "1") { ?>
+                                <select name="bk_status[<?php echo $z ?>]" class="selectbox100">
+                                    <option value="-1">예약취소</option>
+                                    <option value="1" selected='selected'>예약완료</option>
+                                </select>
+                                <?php } else { ?>
+                                <select name="bk_status[<?php echo $z ?>]" class="selectbox100">
+                                    <option value="-1">예약취소</option>
+                                    <option value="0" selected='selected'>예약대기</option>
+                                    <option value="1">예약완료</option>
+                                </select>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php } ?>
 						</tbody>
 					</table>
 					</form>

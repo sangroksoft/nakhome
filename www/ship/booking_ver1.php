@@ -162,6 +162,12 @@ h3.item-title{display:inline-block;padding-left:20px;}
 .scend {color:red;}
 .guide-wrap{height: 550px;border: 1px solid #d9d9d9;text-align: center;padding: 30% 0;}
 
+#book_theme{font-weight:bolder;display:inline-block;height:34px;padding-top: 8px;}
+#book_members{display:inline-block;height:34px;padding-top: 8px;}
+
+#overbookinNoti{display:none;color:red;}
+#overbookinNoti.show{display:inline-block;}
+
 @media (max-width: 991px) {
 	.swiper-container {height: 320px;}
 	.book-title{display:none;}
@@ -861,26 +867,45 @@ function checkMem() {
 
 // 인원선택시 요금계산후 하단에 표시
 function showResult(bookcnt) {
-	if(checkMem())
-	{
-		var sidx = $.trim($("#s_idx").val());
-		var scymd = $.trim($("#sc_ymd").val());
-		$.ajax({ 
-			type: "GET",
-			url: g5_url+"/ship/ajax_booking_preview.php",
-			data: "s_idx="+sidx+"&sc_ymd="+scymd+"&bk_member_cnt="+bookcnt, 
-			beforeSend: function(){
-				loadstart();
-			},
-			success: function(msg){ 
-				var msgarray = $.parseJSON(msg);
-				$("#book_result").html(msgarray.cont);
-			},
-			complete: function(){
-				loadend();
-			}
-		});
-	}
+
+    if(!bookcnt || bookcnt < 1) {
+        var bookResultReady = "<li class='ready'>※ 예약일자, 어선, 출조인원을 선택하십시오.</li>";
+		$("#book_result").html(bookResultReady);
+        $("#overbookinNoti").removeClass("show");
+    } else {
+        var sidx = $.trim($("#s_idx").val());
+        var scymd = $.trim($("#sc_ymd").val());
+        $.ajax({ 
+            type: "GET",
+            url: g5_url+"/ship/ajax_booking_preview.php",
+            data: "s_idx="+sidx+"&sc_ymd="+scymd+"&bk_member_cnt="+bookcnt, 
+            beforeSend: function(){
+                loadstart();
+            },
+            success: function(msg){ 
+                var msgarray = $.parseJSON(msg);
+                if(msgarray.rslt == "error")
+                {
+                    alert(msgarray.errcode); 
+                    if(msgarray.errurl) {document.location.replace(msgarray.errurl);}
+                    else {	loadend(); return false;}
+                }
+                else
+                {
+                    $("#book_result").html(msgarray.cont);
+                    if(msgarray.overbooking == 1) {
+                        $("#overbookinNoti").addClass("show");
+                    } else {
+                        $("#overbookinNoti").removeClass("show");
+                    }
+                }
+            },
+            complete: function(){
+                loadend();
+            }
+        });
+    }
+
 }
 
 function blinker() {
@@ -1107,8 +1132,12 @@ $(document).ready(function(){
 // 예약하기
 function fbook_submit(f)
 {
-	ajax_fbook_submit();
-	return false;
+    if(!(confirm("예약을 진행하시겠습니까?"))) {
+        return false;
+    } else {
+        ajax_fbook_submit();
+        return false;
+    }
 }
 
 // 예약 ajax처리

@@ -3,8 +3,7 @@ include_once('./_common.php');
 
 $returnVal = "";
 
-if(!$is_member)
-{
+if(!$is_member){
 	$errorstr = "로그인 후 이용하실 수 있습니다.";
 	$errorurl = G5_URL;
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
@@ -13,52 +12,73 @@ if(!$is_member)
 // ********에러검증 시작 ************//
 $bk_idx = $_POST['bk_idx'];
 $bk_idx =  preg_replace('/[^0-9]/', '', $bk_idx);
-if(!$bk_idx || $bk_idx < 1)
-{
+if(!$bk_idx || $bk_idx < 1){
 	$errorstr = "예약키값 오류입니다.";
 	$errorurl = "reload";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
 
 $bk = sql_fetch(" select * from m_bookdata where bk_idx = '{$bk_idx}' ");
-if(!$bk['bk_idx'])
-{
+if(!$bk['bk_idx']){
 	$errorstr = "존재하지 않는 예약입니다.";
 	$errorurl = "reload";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
-if($bk['bk_mb_id'] != $member[mb_id])
-{
+if($bk['bk_mb_id'] != $member[mb_id]){
 	$errorstr = "비정상적인 접근입니다.";
 	$errorurl = G5_URL;
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
 
 $s_idx = $bk['s_idx'];
+$sc_idx = $bk['sc_idx'];
 $bk_ymd = $bk['bk_ymd'];
 $bk_status = $bk['bk_status'];
 
 // 예약상태체크
-if(!$bk_status < 0)
-{
-	$errorstr = "취소된 예약은 수정할 수 없습니다.";
+if($bk_status != 0){
+	$errorstr = "예약을 수정할 수 없습니다.";
 	$errorurl = "reload";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
 
 // 예약인원
 $bk_member_cnt = (int)preg_replace('/[^0-9-]/', '', $_POST['bk_member_cnt']);
-if($bk_member_cnt < 1)
-{
+if($bk_member_cnt < 1){
 	$errorstr = "예약인원을 정확히 선택하십시오.";
 	$errorurl = "";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
 
+$sc=sql_fetch(" select * from m_schedule where sc_idx='{$sc_idx}'");
+if(!$sc['sc_idx']) {
+    $errorstr = "예약설정일자 오류입니다.";
+    $errorurl = "";
+    $returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
+}
+
+$sc_available = $sc['sc_max'] - $sc['sc_booked'];
+
+/* 예약가능인원체크 - 출조가능인원을 초과하면 에러. */
+if($bk_member_cnt > $sc[sc_max]){
+    $errorstr = "예약가능한 인원을 초과했습니다.";
+    $errorurl = "";
+    $returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
+}
+/* 예약가능인원체크 - 초과예약인원을 받는 여부. */
+if($bk_member_cnt > $sc_available){
+    if($comfig['overbooking'] == "1") {
+        ;
+    } else {
+        $errorstr = "예약가능한 인원을 초과했습니다.";
+        $errorurl = "";
+        $returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
+    }
+}
+
 // 입금자명
 $bk_banker = clean_xss_tags(trim($_POST['bk_banker']));
-if(!$bk_banker || $bk_banker == "")
-{
+if(!$bk_banker || $bk_banker == ""){
 	$errorstr = "예약자명을 입력하세요.";
 	$errorurl = "";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
@@ -67,16 +87,12 @@ if(!$bk_banker || $bk_banker == "")
 // 예약자 핸드폰번호
 $bk_tel = clean_xss_tags(trim($_POST['bk_tel']));
 $bk_tel = preg_replace("/[^0-9]/", "", $bk_tel);
-if(!$bk_tel)
-{
+if(!$bk_tel){
 	$errorstr = "휴대폰번호를 입력해 주십시오.";
 	$errorurl = "";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
-}
-else 
-{
-	if(!preg_match("/^01[0-9]{8,9}$/", $bk_tel))
-	{
+} else {
+	if(!preg_match("/^01[0-9]{8,9}$/", $bk_tel)){
 		$errorstr = "휴대폰번호를 올바르게 입력해 주십시오.";
 		$errorurl = "";
 		$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 

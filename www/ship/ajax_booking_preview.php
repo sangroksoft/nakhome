@@ -86,6 +86,13 @@ if(!$bk_member_cnt || $bk_member_cnt < 1)
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
 
+// 예약가능인원 초과여부(오버부킹)
+$is_overbooking = 0;
+$available = $sc['sc_max'] - $sc['sc_booked'];
+if($bk_member_cnt > $available) {
+    $is_overbooking = 1;
+}
+
 // 총출조비용
 $bk_price_total = $sc_price * $bk_member_cnt;
 
@@ -104,12 +111,18 @@ $bookResult .= '</li>';
 $bookResult .= '<li class="bk_result_desc">';
 $bookResult .= '※ 총 예약금액 중에 <span class="bk-contract-price">계약금('.number_format($bk_price_total_tmp).'원) 이상 입금</span> 시 예약완료 됩니다.';
 $bookResult .= '</li>';
+if($comfig['bkmode'] == "ver1") {
+    $bookResult .= '<li class="bk_result_desc" id="overbookinNoti">';
+    $bookResult .= '※ 대기접수 시에는 승선예약이 확정된 후에 입금해 주세요.';
+    $bookResult .= '</li>';
+}
 //===================== 달력정보가져옴 ========================
 
 $returnVal = json_encode(
 	array(
 		"rslt"=>"ok", 
-		"cont"=>$bookResult
+		"cont"=>$bookResult,
+		"overbooking"=>$is_overbooking
 	)
 );
 

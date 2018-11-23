@@ -42,6 +42,7 @@ $sql = " update m_config
                 book_process = '{$_POST['book_process']}',
                 refund_process = '{$_POST['refund_process']}',
                 usebooking = '{$_POST['usebooking']}',
+                overbooking = '{$_POST['overbooking']}',
                 bkmode = '{$_POST['bkmode']}',
                 main_bkmode = '{$_POST['main_bkmode']}',
                 etc_notice = '{$_POST['etc_notice']}'

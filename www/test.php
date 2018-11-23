@@ -57,7 +57,7 @@ preg_match_all('@^wd+@i',$subject,$match);
 print_r2($match);
 */
 
-
+/*
 $last_month_start = new DateTime("first day of -2 month");
 $last_month_end = new DateTime("last day of -2 month");
 $next_month_start = new DateTime("first day of +3 month");
@@ -71,10 +71,25 @@ echo $next_month_start->format('Y-m-d'); // 2012-02-01
 echo "<br>"; // 2012-02-01
 echo $next_month_end->format('Y-m-d'); // 2012-02-29
 echo "<br>2222"; // 2012-02-01
+*/
 
+/*
 
+$sql = " select * from m_bookdata where (1) ";
+$result = sql_query($sql);
+for($i=0;$row=sql_fetch_array($result);$i++) {
 
+    $sql2 = " select * from m_schedule where s_idx='{$row['s_idx']}' and sc_ymd = '{$row['bk_ymd']}' ";
+    $result2 = sql_query($sql2);
 
+    for($j=0;$row2=sql_fetch_array($result2);$j++) {
+
+        sql_query(" update m_bookdata set sc_idx='{$row2['sc_idx']}' where bk_idx='{$row['bk_idx']}' ");
+
+    }
+}
+
+*/
 
 
 ?>

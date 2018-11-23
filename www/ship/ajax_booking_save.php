@@ -54,13 +54,14 @@ if(!$bk_member_cnt || $bk_member_cnt < 1)
 }
 
 $ship_available = $ship[s_max];
+/*
 if($bk_member_cnt > $ship_available)
 {
 	$errorstr = "예약가능한 인원을 초과했습니다.";
 	$errorurl = "";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
-
+*/
 //===================== 달력정보가져옴 ========================
 $bk_ymd = trim($_POST[sc_ymd]);
 //날짜자리수체크
@@ -87,32 +88,46 @@ $bk_m = substr($bk_ymd,4,2);
 $bk_d = substr($bk_ymd,6,2);
 
 $sc = sql_fetch(" select * from m_schedule where s_idx='{$s_idx}' and sc_ymd='{$bk_ymd}' ");
-if(!$sc[sc_idx])
+if(!$sc['sc_idx'])
 {
 	$errorstr = "선택하신 예약일자에 예약할 수 없습니다.";
 	$errorurl = "reload";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
-if($sc[sc_status] != "0")
+if($sc['sc_status'] != "0")
 {
 	$errorstr = "선택하신 예약일자에 예약할 수 없습니다.";
 	$errorurl = "reload";
 	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
 }
-/* 예약가능인원체크 - 여분의 예약인원을 받으려면 아래 주석처리함. 반대로 해당일 정원만큼만 예약인원을 받으려면 주석해제. */
-$sc_available = $sc[sc_max] - $sc[sc_booked];
+
+$sc_idx = $sc['sc_idx'];
+$sc_available = $sc['sc_max'] - $sc['sc_booked'];
+
+/* 예약가능인원체크 - 출조가능인원을 초과하면 에러. */
+if($bk_member_cnt > $sc['sc_max'])
+{
+    $errorstr = "예약가능한 인원을 초과했습니다.";
+    $errorurl = "";
+    $returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
+}
+/* 예약가능인원체크 - 초과예약인원을 받는 여부. */
 if($bk_member_cnt > $sc_available)
 {
-	$errorstr = "예약가능한 인원을 초과했습니다.";
-	$errorurl = "";
-	$returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
+    if($comfig['overbooking'] == "1") {
+        ;
+    } else {
+        $errorstr = "예약가능한 인원을 초과했습니다.";
+        $errorurl = "";
+        $returnVal = returnErrorArr($errorstr,$errorurl); echo $returnVal; exit; 
+    }
 }
 
 // 출조제목
-$bk_theme = addslashes(trim($sc[sc_theme]));
+$bk_theme = addslashes(trim($sc['sc_theme']));
 
 // 1인당 출조비용
-$bk_price = $sc[sc_price];
+$bk_price = $sc['sc_price'];
 $bk_price = (int)preg_replace('/[^0-9]/', '', $bk_price);
 if(!$bk_price || $bk_price < 1)
 {
@@ -174,7 +189,8 @@ if (isset($_POST['bk_memo']))
 
 // 정보 업데이트
 $sql = " insert into m_bookdata 
-				set bk_ymd = '{$bk_ymd}', 
+				set  sc_idx = '{$sc_idx}', 
+                     bk_ymd = '{$bk_ymd}', 
 					 bk_status = '0', 
 					 bk_gubun = '', 
 					 bk_mb_id = '{$bk_mb_id}', 

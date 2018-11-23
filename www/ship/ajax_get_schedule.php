@@ -78,6 +78,9 @@ else $sc_theme = get_text($sc[sc_theme]);
 // 출조지점
 $sc_point = get_text($sc[sc_point]);
 
+// 출조인원
+$sc_max = $sc[sc_max];
+
 // 출조가격
 $sc_price = $sc[sc_price];
 
@@ -115,7 +118,7 @@ if($b1cnt > 0) {
 // 예약접수/완료 html
 $sc_bk_members='<div id="sc_members">';
 $sc_bk_members.='<ul class="list-unstyled lists-v1">';
-$sc_bk_members.='<li><i class="fa fa-angle-right"></i>예약접수(입금대기) : '.$b0_array.'</li>';
+$sc_bk_members.='<li><i class="fa fa-angle-right"></i>예약대기(입금대기) : '.$b0_array.'</li>';
 $sc_bk_members.='<li><i class="fa fa-angle-right"></i>예약완료(입금완료) : '.$b1_array.'</li>';
 $sc_bk_members.='</ul>';
 $sc_bk_members.='</div>';
@@ -123,39 +126,45 @@ $sc_bk_members.='</div>';
 // 예약가능인원
 $available = $sc[sc_max] - $sc[sc_booked];
 $available_str = $available."명";
-if(!$sc[sc_idx]) 
-{
+if(!$sc[sc_idx]) {
 	$available = 0;
 	$available_str = '<span style="color:red;">예약불가</span>';
-}
-else
-{
-	if($sc[sc_status] != "0") 
-	{
+} else {
+	if($sc[sc_status] != "0") {
 		$available = 0;
 		$available_str = '<span style="color:red;">예약마감</span>';
 	}
-	if($available == "0") 
-	{
+	if($available == "0") {
 		$available = 0;
-		$available_str = '<span style="color:red;">예약마감</span>';
-	}
+
+        if($comfig['overbooking'] == "1") {
+            $available_str = '<span style="color:blue;">대기접수가능</span>';
+        } else {
+            $available_str = '<span style="color:red;">예약마감</span>';
+        }
+    }
 }
 $sc_theme_total = "<span style='color:blue;font-weight:bolder;'>".$ship_name."</span> ";
 $sc_theme_total .= "<span style='color:red;font-weight:bolder;'>".$sc_m."월 ".$sc_d."일 </span> ";
 $sc_theme_total .= "<span style='color:blue;font-weight:bolder;'>".$sc_theme."</span>";
 
 $selBox = "<option value=''>인원선택</option>";
-for($i=0;$i<$available;$i++) {
+for($i=0;$i<$sc_max;$i++) {
+
+    $addOptStr = "";
+    if($comfig['overbooking'] == "1") {
+        if($i>=$available) {
+            $addOptStr = "(대기접수)";
+        }
+    }    
 	$j=$i+1;
-	$selBox .= "<option value='".$j."'>".$j."명</option>";
+	$selBox .= "<option value='".$j."'>".$j."명".$addOptStr."</option>";
 }
 
 $sc_cont = '';
 // 해당일 기상정보
 $fcam = sql_fetch(" select * from m_fcst where ymd='{$sc_ymd}' and dayb='오전' ");
-if($fcam[ymd])
-{
+if($fcam[ymd]) {
 	$wicon = "<img src='".$fcam[wicon]."' style='height:15px;'>";
 	$sc_cont .= '<div class="fcstWrap">';
 	$sc_cont .= '<div class="fcstdb">오전</div>';
@@ -164,8 +173,7 @@ if($fcam[ymd])
 	$sc_cont .= '<span class="txt-bold">날씨</span><span class="txt-fcst"> : '.$fcam[sky].$wicon.'</span>';
 	$sc_cont .= '<span class="txt-bold">파고</span><span class="txt-fcst"> : '.$fcam[wv].'</span>';
 	$sc_cont .= '</div>';
-	if($fcam[wd] && $fcam[ws])
-	{
+	if($fcam[wd] && $fcam[ws]) {
 		$sc_cont .= '<div class="fcst">';
 		$sc_cont .= '<span class="txt-bold">풍향</span><span class="txt-fcst"> : '.$fcam[wd].'</span>';
 		$sc_cont .= '<span class="txt-bold">풍속</span><span class="txt-fcst"> : '.$fcam[ws].'</span>';
@@ -177,8 +185,7 @@ if($fcam[ymd])
 }
 
 $fcpm = sql_fetch(" select * from m_fcst where ymd='{$sc_ymd}' and dayb='오후' ");
-if($fcpm[ymd])
-{
+if($fcpm[ymd]) {
 	$wicon = "<img src='".$fcpm[wicon]."' style='height:15px;'>";
 	$sc_cont .= '<div class="fcstWrap2">';
 	$sc_cont .= '<div class="fcstdb">오후</div>';
@@ -187,8 +194,7 @@ if($fcpm[ymd])
 	$sc_cont .= '<span class="txt-bold">날씨</span><span class="txt-fcst"> : '.$fcpm[sky].$wicon.'</span>';
 	$sc_cont .= '<span class="txt-bold">파고</span><span class="txt-fcst"> : '.$fcpm[wv].'</span>';
 	$sc_cont .= '</div>';
-	if($fcpm[wd] && $fcpm[ws])
-	{
+	if($fcpm[wd] && $fcpm[ws]) {
 		$sc_cont .= '<div class="fcst">';
 		$sc_cont .= '<span class="txt-bold">풍향</span><span class="txt-fcst"> : '.$fcpm[wd].'</span>';
 		$sc_cont .= '<span class="txt-bold">풍속</span><span class="txt-fcst"> : '.$fcpm[ws].'</span>';
@@ -199,11 +205,9 @@ if($fcpm[ymd])
 	$sc_cont .= '</div>';
 }
 
-if(!$fcpm[ymd] && !$fcam[ymd])
-{
+if(!$fcpm[ymd] && !$fcam[ymd]) {
 	$fcall = sql_fetch(" select * from m_fcst where ymd='{$sc_ymd}' and dayb='종일' ");
-	if($fcall[ymd])
-	{
+	if($fcall[ymd]) {
 		$wicon = "<img src='".$fcall[wicon]."' style='height:15px;'>";
 		$sc_cont .= '<div class="fcstWrap2">';
 		$sc_cont .= '<div class="fcstdb">종일</div>';
@@ -212,8 +216,7 @@ if(!$fcpm[ymd] && !$fcam[ymd])
 		$sc_cont .= '<span class="txt-bold">날씨</span><span class="txt-fcst"> : '.$fcall[sky].$wicon.'</span>';
 		$sc_cont .= '<span class="txt-bold">파고</span><span class="txt-fcst"> : '.$fcall[wv].'</span>';
 		$sc_cont .= '</div>';
-		if($fcall[wd] && $fcall[ws])
-		{
+		if($fcall[wd] && $fcall[ws]) {
 			$sc_cont .= '<div class="fcst">';
 			$sc_cont .= '<span class="txt-bold">풍향</span><span class="txt-fcst"> : '.$fcall[wd].'</span>';
 			$sc_cont .= '<span class="txt-bold">풍속</span><span class="txt-fcst"> : '.$fcall[ws].'</span>';
@@ -249,24 +252,30 @@ for($i=0; $row=sql_fetch_array($result);$i++) {
 	
 	$_ship_scsql = sql_fetch(" select * from m_schedule where s_idx = '{$row[s_idx]}' and sc_ymd = '{$sc_ymd}' ");
 	$_available = $_ship_scsql[sc_max] - $_ship_scsql[sc_booked];
-	if($_ship_scsql[sc_status] != "0") 
-	{
-		$_available = "0";
-	}
-	if($_available== "0") 
-	{
-		$_available = "마감";
-	}
+	
+    if(!$_ship_scsql['sc_idx']) {
+        $_available = "0";
+    } else {
+        if($_ship_scsql[sc_status] != "0") {
+            $_available = "마감";
+        } else {
+            if($_available== "0") {
+                $_available = "마감";
+                if($comfig['overbooking'] == "1") {
+                    $_available = '대기접수';
+                } else {
+                    $_available = '마감';
+                }
+            }
+        }
+    }
 
 	if($row[s_idx]==$s_idx)  { $is_selected = " on";  $is_selected2 = " selected='selected' ";}
 	else {$is_selected = "";  $is_selected2 = "";}
 
-	if($is_specific == "0")
-	{	
+	if($is_specific == "0")	{	
 		$_ship_arr .= "<li class='ship-li'><span id='shipLi_".$row[s_idx]."' class='ship-name".$is_selected."' data-sidx='".$row[s_idx]."'>".$_ship_name."</span></li>";
-	}
-	else if($is_specific == "1")
-	{	
+	} else if($is_specific == "1") {	
 		$_ship_arr .= "<li class='ship-li'><span id='shipLi_".$row[s_idx]."' class='ship-name".$is_selected."' data-sidx='".$row[s_idx]."'>".$_ship_name."(".$_available.")</span></li>";
 	}
 

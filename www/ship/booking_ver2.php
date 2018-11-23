@@ -73,6 +73,7 @@ span.bk-status.end {color:gray;}
 .bk_btn {position: absolute;bottom: 5px;left: 0;width: 100%;text-align: center;}
 .bk_btn a{display:inline-block;background: #ff7272;border: none;padding: 5px;color: #ffffff;}
 .bk_btn button{background: #ff7272;border:none;padding: 5px;color: #ffffff;}
+.bk_btn button.btn-wait{background: #74abff;}
 
 .bd-btm {border-bottom:2px solid #777;}
 

@@ -73,8 +73,6 @@ echo $next_month_end->format('Y-m-d'); // 2012-02-29
 echo "<br>2222"; // 2012-02-01
 */
 
-/*
-
 $sql = " select * from m_bookdata where (1) ";
 $result = sql_query($sql);
 for($i=0;$row=sql_fetch_array($result);$i++) {
@@ -88,8 +86,5 @@ for($i=0;$row=sql_fetch_array($result);$i++) {
 
     }
 }
-
-*/
-
 
 ?>

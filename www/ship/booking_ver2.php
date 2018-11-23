@@ -159,7 +159,7 @@ span.bk-status.end {color:gray;}
 							</tr>
 							<tr>
 								<th scope="row" class="hidden-xxs hidden-xs hidden-sm lsh-th1">
-									<label for="ca_name" class="lsh-label">독선예약</label>
+									<label for="ca_name" class="lsh-label">독선예약안내</label>
 								</th>
 								<td class="lsh-td1">
 									<div class="note visible-sm visible-xs visible-xxs"><span class="notespan"><i class="fa fa-check"></i> 독선예약</span></div>

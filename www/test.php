@@ -87,4 +87,6 @@ for($i=0;$row=sql_fetch_array($result);$i++) {
     }
 }
 
+// 깃헙자동배포 테스트
+
 ?>
